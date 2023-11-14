@@ -1,6 +1,7 @@
 # ---------------------------------------
 # Sec-Sci AutoPT - January 2018
 # ---------------------------------------
+# Tool:      xReport Extender v1.0
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # @license:  GNU GPL 3.0

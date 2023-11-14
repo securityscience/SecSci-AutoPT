@@ -1,6 +1,7 @@
 # ---------------------------------------
 # Sec-Sci AutoPT v3.2311 - January 2018
 # ---------------------------------------
+# Tool:      File Encryptor v3.2311
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # @license:  GNU GPL 3.0

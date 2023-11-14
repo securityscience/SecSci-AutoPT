@@ -1,7 +1,12 @@
-# Password Encryptor v.1.0
-# Author: Arnel C. Reyes
-# Email: arnel.reyes@ncrvoyix.com / arnel.reyes@security-science.com
-# Python 3.9.x or later
+# ---------------------------------------
+# Sec-Sci AutoPT v3.2311 - January 2018
+# ---------------------------------------
+# Tool:      Password Encryptor v1.0
+# Site:      www.security-science.com
+# Email:     RnD@security-science.com
+# @license:  GNU GPL 3.0
+# @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM
+
 # pip install cryptography
 
 

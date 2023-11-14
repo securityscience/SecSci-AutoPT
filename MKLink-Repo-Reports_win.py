@@ -1,12 +1,12 @@
-# -------------------------------------------- #
-#          Sec-Sci AutoPT | 2018-2023          #
-# -------------------------------------------- #
-# Site:      www.security-science.com          #
-# Email:     RnD@security-science.com          #
-# Creator:   Arnel C. Reyes                    #
-# @license:  GNU GPL 3.0                       #
-# @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM #
-# -------------------------------------------- #
+# ---------------------------------------
+# Sec-Sci AutoPT v3.2311 - January 2018
+# ---------------------------------------
+# Tool:      MKLinker v1.0
+# Site:      www.security-science.com
+# Email:     RnD@security-science.com
+# @license:  GNU GPL 3.0
+# @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM
+
 
 import os
 import sys
