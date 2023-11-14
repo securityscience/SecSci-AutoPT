@@ -1,0 +1,94 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"><title>Sec-Sci AutoPT Report</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none';img-src 'self' data:;style-src 'unsafe-inline'">
+<style type="text/css">
+body { background: #dedede; font-family: 'Droid sans', Helvetica, Arial, sans-serif; color: #404042; -webkit-font-smoothing: antialiased; }
+#container { width: 930px; padding: 0 15px; margin: 20px auto; background-color: #ffffff; }
+table { font-family: Arial, sans-serif; }
+a:link, a:visited { color: #ff6633; text-decoration: none; transform: 0.3s; }
+a:hover, a:active { color: #e24920; text-decoration: underline; }
+h1 { font-size: 1.6em; line-height: 1.4em; font-weight: normal; color: #404042; }
+h2 { font-size: 1.3em; line-height: 1.2em; padding: 0; margin: 0.8em 0 0.3em 0; font-weight: normal; color: #404042;}
+h4 { font-size: 1.0em; line-height: 1.2em; padding: 0; margin: 0.8em 0 0.3em 0; font-weight: bold; color: #404042;}
+.rule { height: 0px; border-top: 1px solid #404042; padding: 0; margin: 20px -15px 0 -15px; }
+.title { color: #ffffff; background: #1e517e; margin: 0 -15px 10px -15px; overflow: hidden; }
+.title h1 { color: #ffffff; padding: 10px 15px; margin: 0; font-size: 1.8em; }
+.title img { float: right; display: inline; padding: 1px; }
+.heading { background: #404042; margin: 0 -15px 10px -15px; padding: 0; display: inline-block; overflow: hidden; }
+.heading img { float: right; display: inline; margin: 8px 10px 0 10px; padding: 0; }
+.code { font-family: 'Courier New', Courier, monospace; }
+table.overview_table { border: 2px solid #e6e6e6; margin: 0; padding: 5px;}
+table.overview_table td.info { padding: 5px; background: #dedede; text-align: right; border-top: 2px solid #ffffff; border-right: 2px solid #ffffff; }
+table.overview_table td.info_end { padding: 5px; background: #dedede; text-align: right; border-top: 2px solid #ffffff; }
+table.overview_table td.colour_holder { padding: 0px; border-top: 2px solid #ffffff; border-right: 2px solid #ffffff; }
+table.overview_table td.colour_holder_end { padding: 0px; border-top: 2px solid #ffffff; }
+table.overview_table td.label { padding: 5px; font-weight: bold; }
+table.summary_table td { padding: 5px; background: #dedede; text-align: left; border-top: 2px solid #ffffff; border-right: 2px solid #ffffff; }
+table.summary_table td.icon { background: #404042; }
+.colour_block { padding: 5px; text-align: right; display: block; font-weight: bold; }
+.high_certain { border: 2px solid #f32a4c; color: #ffffff; background: #f32a4c; }
+.high_firm { border: 2px solid #f997a7; background: #f997a7; }
+.high_tentative { border: 2px solid #fddadf; background: #fddadf; }
+.medium_certain { border: 2px solid #ff6633; color: #ffffff; background: #ff6633; }
+.medium_firm { border: 2px solid #ffb299; background: #ffb299; }
+.medium_tentative { border: 2px solid #ffd9cc; background: #ffd9cc; }
+.low_certain { border: 2px solid #0094ff; color: #ffffff; background: #0094ff; }
+.low_firm { border: 2px solid #7fc9ff; background: #7fc9ff; }
+.low_tentative { border: 2px solid #bfe4ff; background: #bfe4ff; }
+.info_certain { border: 2px solid #7e8993; color: #ffffff; background: #7e8993; }
+.info_firm { border: 2px solid #b9ced2; background: #b9ced2; }
+.info_tentative { border: 2px solid #dae9ef; background: #dae9ef; }
+.row_total { border: 1px solid #dedede; background: #fff; }
+.grad_mark { padding: 4px; border-left: 1px solid #404042; display: inline-block; }
+.bar { margin-top: 3px; }
+.TOCH0 { font-size: 1.0em; font-weight: bold; word-wrap: break-word; }
+.TOCH1 { font-size: 0.8em; text-indent: -20px; padding-left: 50px; margin: 0; word-wrap: break-word; }
+.TOCH2 { font-size: 0.8em; text-indent: -20px; padding-left: 70px; margin: 0; word-wrap: break-word; }
+.BODH0 { font-size: 1.6em; line-height: 1.2em; font-weight: normal; padding: 10px 15px; margin: 0 -15px 10px -15px; display: inline-block; color: #ffffff; background-color: #1e517e; width: 100%; word-wrap: break-word; }
+.BODH0 a:link, .BODH0 a:visited, .BODH0 a:hover, .BODH0 a:active { color: #ffffff; text-decoration: none; }
+.BODH1 { font-size: 1.3em; line-height: 1.2em; font-weight: normal; padding: 13px 15px; margin: 0 -15px 0 -15px; display: inline-block; width: 100%; word-wrap: break-word; }
+.BODH1 a:link, .BODH1 a:visited, .BODH1 a:hover, .BODH1 a:active { color: #404042; text-decoration: none; }
+.BODH2 { font-size: 1.0em; font-weight: bold; line-height: 2.0em; width: 100%; word-wrap: break-word; }
+.PREVNEXT { font-size: 0.7em; font-weight: bold; color: #ffffff; padding: 3px 10px; border-radius: 10px;}
+.PREVNEXT:link, .PREVNEXT:visited { color: #ff6633 !important; background: #ffffff !important; border: 1px solid #ff6633 !important; text-decoration: none; }
+.PREVNEXT:hover, .PREVNEXT:active { color: #fff !important; background: #e24920 !important; border: 1px solid #e24920 !important; text-decoration: none; }
+.TEXT { font-size: 0.8em; padding: 0; margin: 0; word-wrap: break-word; }
+TD { font-size: 0.8em; }
+.HIGHLIGHT { background-color: #fcf446; }
+.rr_div { border: 2px solid #1e517e; width: 916px; word-wrap: break-word; -ms-word-wrap: break-word; margin: 0.8em 0; padding: 5px; font-size: 0.8em; max-height: 300px; overflow-y: auto; }
+
+@media print {
+    body { width: 100%; color: #000000; position: relative; }
+    #container { width: 98%; padding: 0; margin: 0; }
+    h1 { color: #000000; }
+    h2 { color: #000000;}
+    .rule { margin: 20px 0 0 0; }
+    .title { color: #000000; margin: 0 0 10px 0; padding: 10px 0; }
+    .title h1 { color: #000000; }
+    .title img { margin: -3px 0; }
+    .heading { margin: 0 0 10px 0; }
+    .BODH0 { color: #000000; }
+    .BODH1 { color: #000000; }
+    .PREVNEXT { visibility: hidden; display: none; }
+    .rr_div { width: 98%; margin: 0.8em auto; max-height: none !important; overflow: hidden; }
+}
+
+</style>
+</head>
+<body>
+<div id="container">
+<div class="title"><img src="data:image/png;base64,R0lGODlhuAA6APZFAAAAI8rK0RkZOPLy9Orp/2Zb/7y8xvz8/j4+WY+Pnqul/9/f45iYpvX1/7m0/5mR/ygoRuvr7mVleuTi/4N5/3d3itPT2ZGJ/21i//j4/7S0vsHByk9PZ6Kb/19fdczI/+De/wYGKNbT//n5+uPj57Ks/+Xl6fLy/3tx/9zZ/4aGl1ZWbY6G/6qqtW5ugq+vusG9/+/v8UdHYIh//8bC/9jY3tHN/8nF/2BU/9nW/6KirzExTe/t/8/P1ufm/x8fPg8PMH9/kfb291tP/////3Vr/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDYwLCAyMDIwLzA1LzEyLTE2OjA0OjE3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo2OTQyREM1NkRFMTAxMUVBODJBMzgwRTUzNUIwNTRGMiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo2OTQyREM1N0RFMTAxMUVBODJBMzgwRTUzNUIwNTRGMiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjI5QzM2RjdGREUwODExRUE4MkEzODBFNTM1QjA1NEYyIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjI5QzM2RjgwREUwODExRUE4MkEzODBFNTM1QjA1NEYyIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+Af/+/fz7+vn49/b19PPy8fDv7u3s6+rp6Ofm5eTj4uHg397d3Nva2djX1tXU09LR0M/OzczLysnIx8bFxMPCwcC/vr28u7q5uLe2tbSzsrGwr66trKuqqainpqWko6KhoJ+enZybmpmYl5aVlJOSkZCPjo2Mi4qJiIeGhYSDgoGAf359fHt6eXh3dnV0c3JxcG9ubWxramloZ2ZlZGNiYWBfXl1cW1pZWFdWVVRTUlFQT05NTEtKSUhHRkVEQ0JBQD8+PTw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAALAAAAAC4ADoAAAf/gESCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp+goaKjpKWmhAQgqqusra6qBIcDMbS1taeZERYBNRGYJAsLJriFLEPHyMnKy8cshwgA0dLTPx4bxJAmQRDTAAIuFpU/0TvYg8bM6czOhtDd7wAeQuaLL0Dw0i4jk+MA5fTo1Als9gzfuxX0EmkwOM0DP3KD7gFwYSogsw4gHghkV8hdiBcgQyZwF81AQkNC+gFAoCFCDBIaPIQA8IPEpCAuXCSIGI1iKYvLFBDpsLEgACCHDriQ5vAkoRbSVhwwVIODTU0SfZICquzG0KLtoiE9JEQiBKeElkZbUCprRXUd/4hkKAK2o9hEO+4SiRDsKqERwRbMIwJsgS/CBl70mEo42OEaGjQsRrRCLyO+wQwdCDxAkIlgw4JJ9NC30IEeGjawxcT1GAVBrZNxJORu7KF+PwR5iJa7UA9pLwT1cxGAJM3g/axxkyaAAWNClQGE2MdILQBDC6TtJJJ3JRGJ3XrvdQEeAATnllpjaEBEwcAhswfVRmSAqW7ehn5HC06k346Z3QgQQT8QANiNVoNUII0KjViHnXaCdIfAd/D0VoNK3XBA3SRc4TCBIAQQoJE68QkyXyFC6CBRCD3cR1N+wAkX4HJAhIOhN8tJcw0hG0wjQQAbHuJgIdlFs52ERFTgAv+AO+QUBBFC5CgABwgYiGAkXHlFCFEkGkXTD2D+IICBADAwyG4v+hZjf8ztaIEM4bAZjQA7RhAdAAgVIkM3IUDAQQUtHDbIkIQUCcCR0UwoiFuDqLAgYwt0B0ANlHBVwKUFlPBVl2ExJJ0GhKAp3iD6AcCfSgEgohJ/ggghwJyGRCDpOyF4ICihgxiKqHeL9kRIcoWYwKgksR0jlAKYFrBMiUQYZxCdZ+Kn5n4y+pNIP0A8J4h1MaCkwqv4CLAaroLoGmGiPE00SA3SpFoImmdxKJBQhNywrFEhJKDvvhXkWKOLowpS6qnR5HkbuoUwIE2cmvXAgAsc5IgwuUSYyx3/whSqKwhU0QxGSALSaPtIsUN0EKIgIOBwb6e2EXKAo9HIADCM1MrZ1MEAyFwIxwC4e1kCBppEscVI9qoxESCLBcTSTBsoKCQkG0vECRisY1TLdkXji6g0m1rtzYb0w4EhC0WzoyMKR1MBEUNDeDGvGWsFs6cArIblQOxQkA6zJx4y9zVcT+u1zdfGbAjPPjcyQFRsS/OgkefCPWzSAARh+eWYB9EtsQIVkcGmVrOcCOWgoilA1wTHUzjcg6QNAMOOSDN225C/rWjcg/D8tCYkC0VDXbRZZggH7TYeTWeEvLAmsKqKFaTxACA/iAked01RENL4JUh9tReNuyDs1sxJ/++gh5411oOUfdQ8c5tJCPE1M48zAC0Q4iqshJDwww6UGjLCntGon+sYFCq3eW80hAAXAp53AFbJCy4ZAZ58xGKADWygggZoAZqi0ZQeiaUFU4mAdQYnv7BJAwigIoIJ4Ke6QZBgObVqwQIGABgdSOoH8wifdNAzAAUZEGPdAUL/kiQ7v9RgTy4Q2cjegzcveUoAfpkVEG5EQg6u7oTgKh6pssiQEJwNgGL5AZkOFbnbze0oZ4kBhiCAAAwRkHNM5FTWPAUB2NWAi9KQVOrAVgjcjFFthiABGPHxA5Pkior++CHchDCr3lgAj9NYwfOWGMe9OZFWCGCA9KZ3J2+oIP8Cy7Ni8wDAgQA0UgeJMMAKykOOBGxSEBGQyQmDIARF3o4IMSCPtPZSATzuoH6VSMUrhvmKWBhiFrawxSsPEYMNSIY6taAOMqvXx2iMjTAXtNsiFuBMAwRgmYUYgDMDwJhoCgKZ4JzFMmuwgRcEYHdoiecgxCbPetpzE/S8pz73GYl88vOfAMXZNQNK0ID6s6AI1edBE8rQhjr0oRCNqEQnSlFCZKABGMVoJS6aCR6wRxMZUGJFK1UADJjUpJqKRAcK8IBMoMABm3gADEaaCRbMdBA+QAG9HOGD9WjCozG9KU3TI1RB+AAHn3OECF6zT5kO9RI2NUQBfPCIpWIjqYv/cOpTKxFVl+GABx9QQAmKgAEW8OAAY8XADEBABBigoAAUiMsEWICBIiggqQS4gEkp4ICpnOABJkVBCdjTAREIwgYUqCtM5YICGmAAB5kahFtNyoIPEUGrW+VQUYngABS0FQcdyEAGSvDXC/CACB+YKhGsOjUM0OAAJ7hASw+AARhMZQKhJcIM7koEAijgtCz4ABFsgIEcEMEHFNBUA4ZAgVhMoAgznQAK2JoBGGDgc5jNLJZkCgMYOECvH7IuIXhQAKyWIC6sLcFOM4ABHhAAA4cYwkcJEVzdaqm3BTjAci07XM8aAgWGza52RzaDDhhYATBIKgwuQAgbzIAQKfAs/2tnYNhzfCADBbCBIYqwWPoKtwAnIEQRfLBcQvT0EBQQroAH3IiuGgIGLZUsgwfx3tUyFQVFKAIKcFwAGgw3sUWYQV+JMIEZFCDICmBPfYdQCBSkoMQ0hi9ac8xjFW+WxYxwcSFgXK/ZPNfGgqCAcRNxghRQYKdEaAAIZEuE+iJVxBOAMojg64AZhDjMVsYy1K4sCC4P4suDoAGDWfuADifiBiUCQRHaLFwnDwLDGGVylNvs40GgIM96doSWCeFnSy/2BEXQMGtTgAFjNiDJIEipIB7wW94KogQMrm8JZpDUDrRUzr2Fr4H/jAPhdgDNmVbEpiUbYxqjgAJ6TSlrOXtbABbQNS48mAEGLkDXC2D0Ac2+QBEoAFzhDmXaKLBzmiU9ZyLwQMcXmEGOhTsBDKBAw8FWxAnmW4gTGLMQE8jBfDNw2kE0QAQiuLMgyiyCfguiASkQwb2BKggeKBwVLqMqykQAggPwIKkHIABW483xjnv84yAPucgbGggAOw==" width="184" height="58"><h1>Sec-Sci AutoPT Report</h1></div>
+
+<h1><span style='font-size:18.0pt;font-family:"Calibri"'>Sec-Sci AutoPT Framework</span></h1>
+
+<p><span style='font-family:"Calibri"'>Sec-Sci AutoPT, an Automated Penetration Testing (AutoPT) framework, is a cutting-edge innovative and comprehensive penetration testing automation framework designed to streamline the process of identifying and mitigating security vulnerabilities in applications and systems. It leverages a combination of powerful tools, such as BurpSuite Pro, Docker, Cucumber, Cypress, Selenium, and Python, to automate the entire penetration testing workflow. The following diagram shows the flow and how the pen testing automation works in the build pipeline.</span></p>
+
+<p align="center"><img width=774 height=263 src="Sec-Sci-AutoPT-Framework.png"></p>
+
+<p><span style='font-family:"Calibri"'>Penetration testing is a crucial process that involves simulating real cyber-attacks on applications and systems to uncover potential security vulnerabilities exploitable by attackers. This comprehensive approach encompasses various types of security testing, which safeguards against malicious actors seeking to compromise sensitive information and systems. While certain aspects of penetration testing can be automated, leveraging automated penetration testing tools enables organizations to proactively identify security weaknesses before hackers have a chance to exploit them.
+</span></p>
+<p><span style='font-family:"Calibri"'>Manual penetration testing offers a snapshot of security at a specific point in time. However, it may not account for newly discovered vulnerabilities or those introduced through development errors between testing cycles. Here, the value of an automated pen testing platform becomes evident, as it empowers organizations to continuously monitor and mitigate threats. By conducting regular vulnerability scans, these platforms automatically pinpoint security holes in applications and systems, ensuring timely actions are taken to eliminate risks and protect the business from potential cyber threats.
+</span></p>
+<p><span style='font-family:"Calibri"'>Learn more about <a href="https://www.security-science.com/sec-sci-autopt" target="_blank">Sec-Sci AutoPT</a>
+</span></p><br>
+</body></html>

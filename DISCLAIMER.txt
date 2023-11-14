@@ -1,0 +1,23 @@
+SEC-SCI AUTOPT GNU GENERAL PUBLIC LICENSE DISCLAIMER
+
+This software, Sec-Sci AutoPT, is distributed under the terms of the GNU General Public License (GPL), version 3 or any later version. You should have received a copy of the GPL along with this software. If not, please visit the official GNU website at https://www.gnu.org/licenses/gpl-3.0.html to obtain a copy of the GPL.
+
+Sec-Sci AutoPT is free software: you are free to modify and distribute it under the terms of the GPL. However, this freedom comes with responsibilities and obligations, including:
+
+1. You are required to make the complete source code of any modifications you make to Sec-Sci AutoPT available to anyone who receives a copy of the modified software. This includes the source code for any derivative works.
+
+2. You may not impose any further restrictions on the recipients of Sec-Sci AutoPT beyond those imposed by the GPL. Any distribution of Sec-Sci AutoPT must adhere to the terms and conditions of the GPL.
+
+3. Sec-Sci AutoPT is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY, including but not limited to the implied warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. The authors and copyright holders of Sec-Sci AutoPT shall not be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+By using or distributing Sec-Sci AutoPT, you agree to be bound by the terms and conditions of the GNU General Public License. Failure to comply with the GPL may result in the loss of your rights to use, modify, or distribute this software.
+
+For a complete understanding of your rights and responsibilities under the GNU General Public License, strongly recommended reading the full license text provided with this software.
+
+For any questions or inquiries requiring further clarification regarding the GPL license or its application to Sec-Sci AutoPT, please contact WWW.SECURITY-SCIENCE.COM at founder@security-science.com or refer to the official GNU website for more information.
+
+WWW.SECURITY-SCIENCE.COM is also available to discuss licensing and collaboration opportunities.
+
+This disclaimer is subject to change in future releases of Sec-Sci AutoPT. It is your responsibility to ensure compliance with the latest version of the GPL when using or distributing this software.
