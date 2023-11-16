@@ -9,22 +9,40 @@
 # Download and Install GnuPG
 # https://www.gpg4win.org/download.html
 # https://www.gnupg.org/download/index.html
+
 # pip install python-gnupg
+# pip install pywin32
 
 from cryptography.fernet import Fernet
 import subprocess
 import gnupg
 import os
-if os.name == 'nt': import winreg
+if os.name == 'nt':
+    import win32cred
+    import winreg
+else:
+    import keyring
 
 
 def keys_key(key):
 
     where, location = str(key).split('=')
     where = str(where).lower()
-    if where == 'env':
+    if where == 'wcm':
+        try:
+            credential = win32cred.CredRead(location, win32cred.CRED_TYPE_GENERIC, 0)
+            # username = credential["UserName"]
+            password = credential["CredentialBlob"].decode("utf-16")
+            return password
+        except Exception as e:
+            print(f"Error retrieving credential: {e}")
+            return None, None
+    elif where == 'kr':
+        service_name, username = str(location).split(',')
+        return keyring.get_password(service_name, username)
+    elif where == 'env':
         return os.environ.get(location)
-    elif where == 'file':
+    elif where == 'fs':
         try:
             with open(location, 'r') as file:
                 return file.read()
