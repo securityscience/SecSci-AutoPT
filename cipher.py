@@ -12,16 +12,16 @@
 
 # pip install python-gnupg
 # pip install pywin32
+# pip install keyring
 
 from cryptography.fernet import Fernet
 import subprocess
 import gnupg
 import os
+import keyring
 if os.name == 'nt':
     import win32cred
     import winreg
-else:
-    import keyring
 
 
 def keys_key(key):
