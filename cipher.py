@@ -36,7 +36,7 @@ def keys_key(key):
             return password
         except Exception as e:
             print(f"Error retrieving credential: {e}")
-            return None, None
+            return None
     elif where == 'kr':
         service_name, username = str(location).split(',')
         return keyring.get_password(service_name, username)

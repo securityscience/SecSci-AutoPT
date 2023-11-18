@@ -1,7 +1,7 @@
 # ---------------------------------------
 # Sec-Sci AutoPT v3.2311 - January 2018
 # ---------------------------------------
-# Tool:      File Encryptor v3.2311
+# Tool:      Sec-Sci AutoPT v3.2311
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # @license:  GNU GPL 3.0
@@ -294,7 +294,7 @@ def prepare_docker(project_name, image_url):
 
     # Pulling Docker image from the image repository
     print(f'\nPulling Docker Image For {project_name}')
-    docker_pull = subprocess.run(f'docker pull {image_url}')
+    docker_pull = subprocess.run(f'docker pull {image_url}', shell=True)
     if docker_pull.returncode != 0:
         # Send Email: Docker Pull Error
         return False
@@ -306,7 +306,7 @@ def run_container(project_name, ws_dir, docker_volume, docker_entrypoint, image_
     container_volume = f'{str(docker_volume).replace("WSDir", ws_dir)}'
 
     docker_run = subprocess.run(f'docker run --name {project_name} --env-file {env_file} {container_volume} ' +
-                                f'{docker_entrypoint} {image_name} {docker_entrypoint_script}')
+                                f'{docker_entrypoint} {image_name} {docker_entrypoint_script}', shell=True)
 
     return docker_run.returncode
 
@@ -411,7 +411,7 @@ def run_burpsuite(java_dir, burp_dir, burp_temp_dir, ws_dir, project_name):
     burp = subprocess.Popen(f'{java} --illegal-access=permit -jar {burp_jar} ' +
                             f'--xBurp --project-file={burp_project} ' +
                             f'--config-file={burp_config} --auto-repair ' +
-                            '--unpause-spider-and-scanner --disable-auto-update')
+                            '--unpause-spider-and-scanner --disable-auto-update', shell=True)
 
     time.sleep(11)
     return burp.pid
@@ -423,12 +423,22 @@ def export_report(java_dir, burp_dir, ws_dir, project_name, burp_report_format):
     burp_report_filename = os.path.join(ws_dir, project_name)
     burp_project = os.path.join(ws_dir, f'{project_name}.burp')
 
-    print('\nExporting PenTet Report...')
+    print('\nExporting PenTest Report...')
     burp = subprocess.run(f'{java} --illegal-access=permit -Djava.awt.headless=true ' +
                           f'-jar {burp_jar} --xReport {burp_report_format} ' +
                           f'{burp_report_filename} --project-file={burp_project} ' +
-                          '--auto-repair --disable-auto-update')
+                          '--auto-repair --disable-auto-update', shell=True)
     return burp.returncode
+
+
+def get_child_process_ids(pid):
+    try:
+        parent_process = psutil.Process(pid)
+        child_processes = parent_process.children(recursive=True)
+        return [child.pid for child in child_processes]
+    except psutil.NoSuchProcess:
+        print(f'\nProcess ID: {pid} not found.')
+        return []
 
 
 def is_process_id_running(pid):
@@ -600,8 +610,10 @@ def docker_job(new_job, config_settings):
     burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
+    burp_child_pid = get_child_process_ids(burp_pid)[0]
+
     is_container_running = False
-    while is_process_id_running(burp_pid):
+    while is_process_id_running(burp_child_pid):
         if not is_container_running:
             container_status = run_container(project_name, ws_dir, project_settings['docker_volume'],
                                              project_settings['docker_entrypoint'],
@@ -617,6 +629,8 @@ def docker_job(new_job, config_settings):
             is_container_running = True
 
         time.sleep(3)
+
+    terminate_process_id(burp_pid)
 
     print('\nBurp scan completed...')
 
@@ -655,10 +669,12 @@ def cucumber_job(new_job, config_settings):
     burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
+    burp_child_pid = get_child_process_ids(burp_pid)[0]
+
     java = os.path.join(project_settings['java_dir'], 'java')
     project_jar = os.path.join(ws_dir, f'{project_name}.jar')
     is_cucumber_running = False
-    while is_process_id_running(burp_pid):
+    while is_process_id_running(burp_child_pid):
         if not is_cucumber_running:
             print(f'\nRunning Cucumber for {project_name}')
             root_dir = os.getcwd()
@@ -666,7 +682,7 @@ def cucumber_job(new_job, config_settings):
             cucumber_status = subprocess.run(f'{java} ' +
                                              f'-Dhttps.proxyHost={config_settings["proxy_host"]} ' +
                                              f'-Dhttps.proxyPort={config_settings["proxy_port"]} ' +
-                                             f'{project_settings["java_option"]} -jar {project_jar}')
+                                             f'{project_settings["java_option"]} -jar {project_jar}', shell=True)
             os.chdir(root_dir)
 
             if cucumber_status.returncode != 0:
@@ -679,6 +695,8 @@ def cucumber_job(new_job, config_settings):
             is_cucumber_running = True
 
         time.sleep(3)
+
+    terminate_process_id(burp_pid)
 
     print('\nBurp scan completed...')
 
@@ -739,20 +757,22 @@ def robot_framework_job(new_job, config_settings):
     burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
+    burp_child_pid = get_child_process_ids(burp_pid)[0]
+
     # Add Environment Variables
     os.environ['PATH'] += os.pathsep + config_settings['browser_driver_dir']
     os.environ['HTTP_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
     os.environ['HTTPS_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
 
     is_robot_framework_running = False
-    while is_process_id_running(burp_pid):
+    while is_process_id_running(burp_child_pid):
         if not is_robot_framework_running:
             print(f'\nRunning Robot Framework for {project_name}')
             robot_option = project_settings['robot_option']
             root_dir = os.getcwd()
             python = os.path.join(project_settings['python_dir'], 'python')
             os.chdir(os.path.join(ws_dir, project_name))
-            robot_framework_status = subprocess.run(f'{python} {robot_option}')
+            robot_framework_status = subprocess.run(f'{python} {robot_option}', shell=True)
             os.chdir(root_dir)
 
             if robot_framework_status.returncode != 0:
@@ -765,6 +785,8 @@ def robot_framework_job(new_job, config_settings):
             is_robot_framework_running = True
 
         time.sleep(3)
+
+    terminate_process_id(burp_pid)
 
     print('\nBurp scan completed...')
 
@@ -834,6 +856,8 @@ def cypress_job(new_job, config_settings):
     burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
+    burp_child_pid = get_child_process_ids(burp_pid)[0]
+
     # Add Environment Variables
     os.environ['CYPRESS_CACHE_FOLDER'] = config_settings['cypress_dir']
     os.environ['HTTP_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
@@ -845,7 +869,7 @@ def cypress_job(new_job, config_settings):
             print(f'\nRunning Cypress for {project_name}')
             root_dir = os.getcwd()
             os.chdir(os.path.join(ws_dir, project_name))
-            cypress_status = subprocess.run(f'npx.cmd cypress run {project_settings["cypress_option"]}')
+            cypress_status = subprocess.run(f'npx.cmd cypress run {project_settings["cypress_option"]}', shell=True)
             os.chdir(root_dir)
 
             if cypress_status.returncode != 0:
@@ -858,6 +882,8 @@ def cypress_job(new_job, config_settings):
             is_cypress_running = True
 
         time.sleep(3)
+
+    terminate_process_id(burp_pid)
 
     print('\nBurp scan completed...')
 
@@ -928,9 +954,9 @@ def main():
         proxy_port = config_settings['proxy_port']
 
         if encrypt_all_creds == 'on':
-            subprocess.run('python file_encryptor.py -a encrypt')
+            subprocess.run('python file_encryptor.py -a encrypt', shell=True)
         else:
-            subprocess.run('python file_encryptor.py -a decrypt')
+            subprocess.run('python file_encryptor.py -a decrypt', shell=True)
 
         while True:
             new_job = check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir,

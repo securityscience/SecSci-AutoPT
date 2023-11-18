@@ -20,6 +20,7 @@ import getpass
 import base64
 import cipher
 import os
+import re
 
 
 def initialize_config(config_path, config_section='Settings'):
@@ -131,6 +132,34 @@ def import_data_to_keystore(keystore, alias, value):
         return False
 
 
+def validate_password(password):
+    # Check if the password meets certain criteria
+    """if len(password) < 8:
+        return False
+
+    if not re.search(r'[A-Z]', password): return False
+    if not re.search(r'[a-z]', password): return False
+    if not re.search(r'\d', password): return False
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password): return False
+    return True"""
+
+    pattern_description = '''
+Password must meet the following criteria:
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one digit
+- At least one special character (!@#$%^&*(),.?"':{}|<>)
+- Minimum length of 8 characters
+'''
+
+    pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?"\':{}|<>]).{8,}$'
+    if re.match(pattern, password):
+        return True
+    else:
+        print(f"\nInvalid password. Please ensure it meets the criteria:{pattern_description}")
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(description='Sec-Sci AutoPT Password Encryptor v1.0')
     parser.add_argument('-r', '--randomkey', type=str,
@@ -172,10 +201,10 @@ def main():
     # if not args.randomkey:
     if randomkey == 'n':
         if not passkey:
-            passkey = getpass.getpass(prompt='\nEnter password for masterkey: ')
+            passkey = getpass.getpass(prompt='Enter password for masterkey: ')
         if not salt:
-            salt = getpass.getpass(prompt='\nEnter salt for masterkey: ')
-        masterkey = generate_key(passkey, str(salt).encode())
+            salt = getpass.getpass(prompt='Enter salt for masterkey: ')
+        masterkey = generate_key(passkey, salt.encode())
     else:
         masterkey = generate_random_key()
 
@@ -188,7 +217,7 @@ def main():
 
     # Read saved password
     encrypted_password = open('password.dat', 'rb').read()
-    print(f'\nThis is the encrypted password: {encrypted_password}')
+    print(f'This is the encrypted password: {encrypted_password}')
 
     while check_encrypted_password != 'n' and check_encrypted_password != 'y':
         check_encrypted_password = input('\nDo you want to see the password that was encrypted? [y/N]: ').lower() or 'n'
