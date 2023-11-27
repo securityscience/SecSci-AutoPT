@@ -1,3 +1,12 @@
+/* ---------------------------------------
+   Sec-Sci AutoPT v3.2311 - January 2018
+   ---------------------------------------
+   Site:      www.security-science.com
+   Email:     RnD@security-science.com
+   Creator:   ARNEL C. REYES
+   @license:  GNU GPL 3.0
+   @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM
+*/
 
 import java.io.FileInputStream;
 import java.security.KeyStore;

@@ -3,6 +3,7 @@
 # ---------------------------------------
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
+# Creator:   ARNEL C. REYES
 # @license:  GNU GPL 3.0
 # @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM
 
@@ -70,39 +71,9 @@ def keys_key(key):
             print(f"\nAn error occurred: {e}")
 
 
-def secrets_key(java_dir, secrets_dir, key):
-    secrets_cipher = keystore_data(java_dir,
-                                   os.path.join(secrets_dir, 'Keys.jks'),
-                                   keys_key(key),
-                                   'secrets')
-
-    the_masterkey = masterkey(java_dir, secrets_dir, key)
-    the_secrets_key = decrypt_data(secrets_cipher, the_masterkey)
-
-    return the_secrets_key
-
-
-def masterkey(java_dir, secrets_dir, key):
-    the_masterkey = keystore_data(java_dir,
-                                  os.path.join(secrets_dir, 'Keys.jks'),
-                                  keys_key(key),
-                                  'masterkey')
-    return the_masterkey
-
-
-def encryption_key(java_dir, secrets_dir, key):
-    the_secrets_key = secrets_key(java_dir, secrets_dir, key)
-
-    the_masterkey = masterkey(java_dir, secrets_dir, key)
-
-    gpg_passphrase_cipher = keystore_data(java_dir,
-                                          os.path.join(secrets_dir, 'Secrets.jks'),
-                                          the_secrets_key,
-                                          'gpgpassphrase')
-
-    gpg_passphrase = decrypt_data(gpg_passphrase_cipher, the_masterkey)
-
-    return gpg_passphrase
+def get_key(java_dir, secrets_dir, keystore, key, alias):
+    key = keystore_data(java_dir, os.path.join(secrets_dir, keystore), key, alias)
+    return key
 
 
 def encrypt_data(data, key):
@@ -147,7 +118,7 @@ def decrypt_file(gpg_dir, input_file, output_file, passphrase):
 def keystore_data(java_dir, keystore_path, keystore_password, keystore_alias):
     data = subprocess.run([os.path.join(java_dir, 'java'), 'KeyStoreData',
                            keystore_path, keystore_password, keystore_alias],
-                          capture_output=True, text=True)
+                          capture_output=True, text=True, shell=True)
     return data.stdout.strip()
 
 
@@ -158,4 +129,4 @@ def export_pkcs12(java_dir, keystore_path, keystore_password,
     subprocess.run(f'{os.path.join(java_dir, "keytool")} -importkeystore -srckeystore {keystore_path} ' +
                    f'-srcstorepass {keystore_password} -srcalias {src_alias} -destkeystore ' +
                    f'{pkcs12_file} -deststoretype PKCS12 -deststorepass {pkcs12_password} ' +
-                   f'-destalias {dest_alias} -srckeypass {key_password}', input='yes\n', encoding='utf-8')
+                   f'-destalias {dest_alias} -srckeypass {key_password}', input='yes\n', encoding='utf-8', shell=True)

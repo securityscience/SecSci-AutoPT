@@ -1,9 +1,10 @@
 # ---------------------------------------
-# Sec-Sci AutoPT - January 2018
+# Sec-Sci AutoPT v3.2311 - January 2018
 # ---------------------------------------
 # Tool:      xBurp Extender v1.0
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
+# Creator:   ARNEL C. REYES
 # @license:  GNU GPL 3.0
 # @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM
 
@@ -23,7 +24,7 @@ class BurpExtender(IBurpExtender, IHttpListener):
         if '--xBurp' not in args:
             return
 
-        self.packet_timeout = 55
+        self.packet_timeout = 88
         self.last_packet_seen = int(time.time())
         self._callbacks.registerHttpListener(self)
 

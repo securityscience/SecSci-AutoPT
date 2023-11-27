@@ -4,6 +4,7 @@
 # Tool:      Sec-Sci AutoPT v3.2311
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
+# Creator:   ARNEL C. REYES
 # @license:  GNU GPL 3.0
 # @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM
 
@@ -63,7 +64,7 @@ def docker_status():
 
 
 def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                  java_dir, secrets_dir, keys_key, gpg_dir, passphrase,
+                  java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
                   proxy_host, proxy_port):
     job_file = os.path.join(job_dir, '*.job')
 
@@ -74,7 +75,7 @@ def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, en
 
         # Get the oldest job
         if not prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                           java_dir, secrets_dir, keys_key, gpg_dir, passphrase,
+                           java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
                            proxy_host, proxy_port):
 
             return
@@ -84,7 +85,7 @@ def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, en
 
 
 def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                java_dir, secrets_dir, keys_key, gpg_dir, passphrase,
+                java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
                 proxy_host, proxy_port):
     encrypt_all_creds = str(encrypt_all_creds).lower()
     job_file = os.path.basename(new_job)
@@ -154,8 +155,7 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
                 return False
 
         if encrypt_all_creds == 'on':
-            the_masterkey = cipher.masterkey(java_dir, secrets_dir, keys_key)
-            burp_certificate_password = cipher.decrypt_data(burp_certificate_password, the_masterkey)
+            burp_certificate_password = cipher.decrypt_data(burp_certificate_password, masterkey)
             encrypted_files = glob.glob(os.path.join(ws_dir, '*.gpg'))
 
             for encrypted_file in encrypted_files:
@@ -193,7 +193,7 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
 
     include_urls = str(project_settings['include_url']).split(',')
 
-    include_objects = [f'{{"enabled":true,"prefix":"{include_url}"}}' for include_url in include_urls]
+    include_objects = [f'{{"enabled":true,"prefix":"{include_url.strip()}"}}' for include_url in include_urls]
     inc_urls = ','.join(include_objects)
 
     if not include_urls[0]:
@@ -357,23 +357,23 @@ def smtp_mail(smtp_server, smtp_port, smtp_username, smtp_password, email_from, 
         print(e)
 
 
-def send_email(config_settings, email_to, subject, message):
+def send_email(config_settings, email_to, subject, message, masterkey):
     mailer = str(config_settings['mailer']).lower()
     encrypt_all_creds = str(config_settings['encrypt_all_creds']).lower()
-    sendgrid_api_key = 'Something'
-    smtp_password = 'Something'
+    sendgrid_api_key = config_settings['sendgrid_api_key']
+    smtp_password = config_settings['smtp_password']
 
     if encrypt_all_creds == 'on':
-        the_masterkey = cipher.masterkey(config_settings['java_dir'],
+        """the_masterkey = cipher.masterkey(config_settings['java_dir'],
                                          config_settings['secrets_dir'],
-                                         config_settings['keys_key'])
+                                         config_settings['keys_key'])"""
         if mailer == 'sendgrid':
             sendgrid_api_key = cipher.decrypt_data(config_settings['sendgrid_api_key'],
-                                                   the_masterkey)
+                                                   masterkey)
 
         elif mailer == 'smtp':
             smtp_password = cipher.decrypt_data(config_settings['smtp_password'],
-                                                the_masterkey)
+                                                masterkey)
         if not smtp_password or not sendgrid_api_key:
             cleanup_job('Clear', config_settings['ws_dir'])
             print('\nDecryption Error: Please check smtp_password or sendgrid_api_key encrypted data...')
@@ -489,7 +489,7 @@ def uncompressed_file(compressed_file, extract_to_folder):
         return False
 
 
-def docker_job(new_job, config_settings):
+def docker_job(new_job, config_settings, masterkey, passphrase):
     job_name = os.path.split(new_job)[-1]
     project_name = job_name.split('.')[0]
     before_down_time = datetime.now()
@@ -512,7 +512,8 @@ def docker_job(new_job, config_settings):
 
             send_email(config_settings, email_to,
                        docker_service_error_subject,
-                       docker_service_error_message)
+                       docker_service_error_message,
+                       masterkey)
 
             first_email_notice = True
 
@@ -527,7 +528,8 @@ def docker_job(new_job, config_settings):
 
             send_email(config_settings, email_to,
                        docker_service_error_subject,
-                       docker_service_error_message)
+                       docker_service_error_message,
+                       masterkey)
 
             before_down_time = datetime.now()
 
@@ -542,7 +544,6 @@ def docker_job(new_job, config_settings):
     repository_type = str(project_settings['repository_type']).lower()
     image_pull_account_activated = False
     pull_account = ''
-    passphrase = cipher.encryption_key(java_dir, secrets_dir, keys_key)
 
     if repository_type == 'gcr':
         gcr_service_account = project_settings['gcr_service_account']
@@ -585,7 +586,8 @@ def docker_job(new_job, config_settings):
 
         send_email(config_settings, email_to,
                    image_pull_account_activation_error_subject,
-                   image_pull_account_activation_error_message)
+                   image_pull_account_activation_error_message,
+                   masterkey)
 
         cleanup_job(project_name, ws_dir)
         return
@@ -602,7 +604,8 @@ def docker_job(new_job, config_settings):
 
         send_email(config_settings, email_to,
                    pull_error_subject,
-                   pull_error_message)
+                   pull_error_message,
+                   masterkey)
 
         cleanup_job(project_name, ws_dir)
         return
@@ -653,10 +656,11 @@ def docker_job(new_job, config_settings):
 
     send_email(config_settings, email_to,
                success_scan_subject,
-               success_scan_message)
+               success_scan_message,
+               masterkey)
 
 
-def cucumber_job(new_job, config_settings):
+def cucumber_job(new_job, config_settings, masterkey):
     job_name = os.path.split(new_job)[-1]
     project_name = job_name.split('.')[0]
     reports_dir = config_settings['reports_dir']
@@ -719,10 +723,11 @@ def cucumber_job(new_job, config_settings):
 
     send_email(config_settings, email_to,
                success_scan_subject,
-               success_scan_message)
+               success_scan_message,
+               masterkey)
 
 
-def robot_framework_job(new_job, config_settings):
+def robot_framework_job(new_job, config_settings, masterkey):
     job_name = os.path.split(new_job)[-1]
     project_name = job_name.split('.')[0]
     reports_dir = config_settings['reports_dir']
@@ -749,7 +754,8 @@ def robot_framework_job(new_job, config_settings):
 
         send_email(config_settings, email_to,
                    compressed_file_error_subject,
-                   compressed_file_error_message)
+                   compressed_file_error_message,
+                   masterkey)
 
         cleanup_job(project_name, ws_dir)
         return
@@ -817,10 +823,11 @@ def robot_framework_job(new_job, config_settings):
 
     send_email(config_settings, email_to,
                success_scan_subject,
-               success_scan_message)
+               success_scan_message,
+               masterkey)
 
 
-def cypress_job(new_job, config_settings):
+def cypress_job(new_job, config_settings, masterkey):
     job_name = os.path.split(new_job)[-1]
     project_name = job_name.split('.')[0]
     reports_dir = config_settings['reports_dir']
@@ -848,7 +855,8 @@ def cypress_job(new_job, config_settings):
 
         send_email(config_settings, email_to,
                    compressed_file_error_subject,
-                   compressed_file_error_message)
+                   compressed_file_error_message,
+                   masterkey)
 
         cleanup_job(project_name, ws_dir)
         return
@@ -911,7 +919,8 @@ def cypress_job(new_job, config_settings):
 
     send_email(config_settings, email_to,
                success_scan_subject,
-               success_scan_message)
+               success_scan_message,
+               masterkey)
 
 
 def selenium_job():
@@ -945,22 +954,51 @@ def main():
         burp_templates_dir = config_settings['burp_templates_dir']
         reports_dir = config_settings['reports_dir']
         encrypt_all_creds = str(config_settings['encrypt_all_creds']).lower()
+        encryption_mode = str(config_settings['encryption_mode']).lower()
         java_dir = config_settings['java_dir']
         secrets_dir = config_settings['secrets_dir']
         keys_key = config_settings['keys_key']
         gpg_dir = config_settings['gpg_dir']
-        passphrase = cipher.encryption_key(java_dir, secrets_dir, keys_key)
+        passphrase = ''
+        masterkey = ''
         proxy_host = config_settings['proxy_host']
         proxy_port = config_settings['proxy_port']
 
         if encrypt_all_creds == 'on':
+            keys_key = cipher.keys_key(config_settings['keys_key'])
+            if encryption_mode == 'simple':
+                masterkey = cipher.get_key(java_dir, secrets_dir, 'Keys.jks', keys_key, 'masterkey')
+                keys_secrets = cipher.get_key(java_dir, secrets_dir, 'Keys.jks', keys_key, 'secrets')
+                secrets_key = cipher.decrypt_data(keys_secrets, keys_masterkey)
+                gpgpassphrase = cipher.get_key(java_dir, secrets_dir, 'Secrets.jks', secrets_key, 'gpgpassphrase')
+                passphrase = cipher.decrypt_data(gpgpassphrase, keys_masterkey)
+            elif encryption_mode == 'standard':
+                keys_masterkey = cipher.get_key(java_dir, secrets_dir, 'Keys.jks', keys_key, 'masterkey')
+                keys_secrets = cipher.get_key(java_dir, secrets_dir, 'Keys.jks', keys_key, 'secrets')
+                secrets_key = cipher.decrypt_data(keys_secrets, keys_masterkey)
+                secrets_masterkey = cipher.get_key(java_dir, secrets_dir, 'Secrets.jks', secrets_key, 'masterkey')
+                masterkey = cipher.decrypt_data(secrets_masterkey, keys_masterkey)
+                gpgpassphrase = cipher.get_key(java_dir, secrets_dir, 'Secrets.jks', secrets_key, 'gpgpassphrase')
+                passphrase = cipher.decrypt_data(gpgpassphrase, masterkey)
+            elif encryption_mode == 'extreme':
+                extreme_key = cipher.keys_key(config_settings['extreme_key'])
+                keys_key = cipher.decrypt_data(keys_key, extreme_key)
+                keys_masterkey = cipher.get_key(java_dir, secrets_dir, 'Keys.jks', keys_key, 'masterkey')
+                keys_masterkey = cipher.decrypt_data(keys_masterkey, extreme_key)
+                keys_secrets = cipher.get_key(java_dir, secrets_dir, 'Keys.jks', keys_key, 'secrets')
+                secrets_key = cipher.decrypt_data(keys_secrets, keys_masterkey)
+                secrets_masterkey = cipher.get_key(java_dir, secrets_dir, 'Secrets.jks', secrets_key, 'masterkey')
+                masterkey = cipher.decrypt_data(secrets_masterkey, keys_masterkey)
+                gpgpassphrase = cipher.get_key(java_dir, secrets_dir, 'Secrets.jks', secrets_key, 'gpgpassphrase')
+                passphrase = cipher.decrypt_data(gpgpassphrase, masterkey)
+
             subprocess.run('python file_encryptor.py -a encrypt', shell=True)
         else:
             subprocess.run('python file_encryptor.py -a decrypt', shell=True)
 
         while True:
             new_job = check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir,
-                                    encrypt_all_creds, java_dir, secrets_dir, keys_key, gpg_dir, passphrase,
+                                    encrypt_all_creds, java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
                                     proxy_host, proxy_port)
 
             if new_job:
@@ -970,16 +1008,16 @@ def main():
                 cls()
                 if job_type == 'dkr':
                     print('Running Docker Job...')
-                    docker_job(new_job, config_settings)
+                    docker_job(new_job, config_settings, masterkey, passphrase)
                 elif job_type == 'ccb':
                     print('Running Cucumber Job...')
-                    cucumber_job(new_job, config_settings)
+                    cucumber_job(new_job, config_settings, masterkey)
                 elif job_type == 'rfw':
                     print('Running Robot Framework Job...')
-                    robot_framework_job(new_job, config_settings)
+                    robot_framework_job(new_job, config_settings, masterkey)
                 elif job_type == 'cyp':
                     print('Running Cypress Job...')
-                    cypress_job(new_job, config_settings)
+                    cypress_job(new_job, config_settings, masterkey)
                 elif job_type == 'sel':
                     print('Running Selenium Job...')
                     selenium_job()
