@@ -68,7 +68,7 @@ string s = fi[i].ToString();
 string[] fn = s.Split('_');
 
 Response.Write("<tr>");
-Response.Write("<td><a href=\"" + chkArchive + fi[i] + ".html\" target=\"reportView\">" + fn[0] + "</a></td>");
+Response.Write("<td><a href=\"" + chkArchive + s.Substring(0, s.Length - 5) + ".html\" target=\"reportView\">" + fn[0] + "</a></td>");
 Response.Write("<td><a href=\"" + chkArchive + fi[i] + "\" target=\"_blank\">Download</a></td>");
 Response.Write("<td>" + File.GetLastWriteTime(webRootPath + chkArchive + "\\" + fi[i]).ToString() + "</td>"); 
 Response.Write("</tr>");
