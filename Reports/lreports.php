@@ -1,3 +1,13 @@
+<!-- -------------------------------------------- -->
+<!--          Sec-Sci AutoPT | 2018-2023          -->
+<!-- -------------------------------------------- -->
+<!-- Site:      www.security-science.com          -->
+<!-- Email:     RnD@security-science.com          -->
+<!-- Creator:   Arnel C. Reyes                    -->
+<!-- @license:  GNU GPL 3.0                       -->
+<!-- @copyright (C) 2018 WWW.SECURITY-SCIENCE.COM -->
+<!-- -------------------------------------------- -->
+
 <html>
 <head>
     <meta name="referrer" content="no-referrer">
