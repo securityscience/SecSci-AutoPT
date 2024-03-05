@@ -65,7 +65,7 @@ def docker_status():
 
 def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
                   java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
-                  proxy_host, proxy_port):
+                  proxy_host, proxy_port, use_app_burp_file):
     job_file = os.path.join(job_dir, '*.job')
 
     new_jobs = glob.glob(job_file)
@@ -75,8 +75,7 @@ def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, en
 
         # Get the oldest job
         if not prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                           java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
-                           proxy_host, proxy_port):
+                           secrets_dir, gpg_dir, masterkey, passphrase, proxy_host, proxy_port, use_app_burp_file):
 
             return
         return new_job
@@ -85,9 +84,10 @@ def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, en
 
 
 def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
-                proxy_host, proxy_port):
+                secrets_dir, gpg_dir, masterkey, passphrase, proxy_host, proxy_port, use_app_burp_file):
     encrypt_all_creds = str(encrypt_all_creds).lower()
+    # Encrypt or Decrypt Files or Do Nothing
+    process_encryption_mode(encrypt_all_creds)
     job_file = os.path.basename(new_job)
     project_name = str(job_file).split('.')[0]
     job_type = project_name[-3:]
@@ -105,17 +105,25 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
     burp_project = f'{os.path.join(ws_dir, project_name)}.burp'
     shutil.move(new_job, ws_dir)
 
-    # Check Report Dir for Existing Burp File
-    reports_burp_file = glob.glob(os.path.join(reports_dir, f'{project_name}*.burp'))
-    if reports_burp_file:
-        shutil.copy(reports_burp_file[0], burp_project)
-    else:
-        shutil.copy(burp_template, burp_project)
-
     for project_setting in project_settings_files:
         shutil.copy(project_setting, ws_dir)
 
     project_settings = initialize_config(f'{os.path.join(ws_dir, project_name)}.settings')
+
+    # Use application previous scan Burp file: Yes or No
+    if 'use_app_burp_file' in project_settings:
+        use_app_burp_file = str(project_settings['use_app_burp_file']).lower()
+
+    # Check Report Dir for Existing Burp File
+    reports_burp_file = ''
+    if use_app_burp_file == 'yes':
+        reports_burp_file = glob.glob(os.path.join(reports_dir, f'{project_name}*.burp'))
+
+    if reports_burp_file and use_app_burp_file == 'yes':
+        # Use Application Previous Scan Burp File
+        shutil.copy(reports_burp_file[0], burp_project)
+    else:
+        shutil.copy(burp_template, burp_project)
 
     if job_type == 'dkr':
         gpg_extension = ''
@@ -272,7 +280,7 @@ def gcr_account_activation(service_account, service_account_key):
 
 def jfr_account_activation(service_account, service_account_key):
     # JFrog Authentication to download images from the image repository
-    print(f'\nActivating GCR Service Account {service_account}')
+    print(f'\nActivating JFrog Service Account {service_account}')
     account_activation = subprocess.run(f'jfrog auth activate-service-account {service_account} ' +
                                         f'--key-file {service_account_key}', shell=True)
 
@@ -292,12 +300,15 @@ def prepare_docker(project_name, image_url):
     except docker.errors.NotFound:
         print(f'\nContainer {project_name} not found.')
 
-    # Pulling Docker image from the image repository
-    print(f'\nPulling Docker Image For {project_name}')
-    docker_pull = subprocess.run(f'docker pull {image_url}', shell=True)
-    if docker_pull.returncode != 0:
-        # Send Email: Docker Pull Error
-        return False
+    image_url_tag = str(image_url.split(':')[1]).lower().strip()
+
+    if image_url_tag != 'local':
+        # Pulling Docker image from the image repository
+        print(f'\nPulling Docker Image For {project_name}')
+        docker_pull = subprocess.run(f'docker pull {image_url}', shell=True)
+        if docker_pull.returncode != 0:
+            # Send Email: Docker Pull Error
+            return False
     return True
 
 
@@ -498,9 +509,7 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
     ws_dir = config_settings['ws_dir']
     secrets_dir = config_settings['secrets_dir']
     encrypt_all_creds = str(config_settings['encrypt_all_creds']).lower()
-    java_dir = config_settings['java_dir']
     gpg_dir = config_settings['gpg_dir']
-    keys_key = config_settings['keys_key']
 
     while not docker_status():
         email_to = config_settings['admin_email']
@@ -571,6 +580,10 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
         jfr_service_account_key = os.path.join(secrets_dir, f'{project_settings["jfr_service_account_key"]}')
         pull_account = jfr_service_account
         image_pull_account_activated = jfr_account_activation(jfr_service_account, jfr_service_account_key)
+
+    elif repository_type == 'local':
+        # Skip Pull Account Activation for imported image
+        image_pull_account_activated = True
 
     if not image_pull_account_activated:
         image_pull_account_activation_error_subject = (
@@ -867,12 +880,18 @@ def cypress_job(new_job, config_settings, masterkey):
     burp_child_pid = get_child_process_ids(burp_pid)[0]
 
     # Add Environment Variables
-    os.environ['CYPRESS_CACHE_FOLDER'] = config_settings['cypress_dir']
+    '''if 'cypress_dir' in project_settings:
+        cypress_dir = project_settings['cypress_dir']
+    else:
+        cypress_dir = config_settings['cypress_dir']
+    print(cypress_dir)
+    exit()'''
+    os.environ['CYPRESS_CACHE_FOLDER'] = project_settings['cypress_dir']
     os.environ['HTTP_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
     os.environ['HTTPS_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
 
     is_cypress_running = False
-    while is_process_id_running(burp_pid):
+    while is_process_id_running(burp_child_pid):
         if not is_cypress_running:
             print(f'\nRunning Cypress for {project_name}')
             root_dir = os.getcwd()
@@ -928,6 +947,16 @@ def selenium_job():
     print('Selenium will be available in the future release...')
 
 
+def process_encryption_mode(encrypt_all_creds):
+    print(encrypt_all_creds)
+    if encrypt_all_creds == 'on':
+        subprocess.run('python file_encryptor.py -a encrypt', shell=True)
+    elif encrypt_all_creds == 'off':
+        subprocess.run('python file_encryptor.py -a decrypt', shell=True)
+    else:
+        print('Never encrypt or decrypt.')
+
+
 def main():
     ws_dir = ''
     try:
@@ -943,8 +972,7 @@ def main():
                               ('burp_templates_dir', os.path.join(os.getcwd(), 'Templates')),
                               ('reports_dir', os.path.join(os.getcwd(), 'Reports')),
                               ('secrets_dir', os.path.join(os.getcwd(), 'Secrets')),
-                              ('browser_driver_dir', os.path.join(os.getcwd(), 'Drivers')),
-                              ('cypress_dir', os.path.join(os.getcwd(), 'Cypress'))]:
+                              ('browser_driver_dir', os.path.join(os.getcwd(), 'Drivers'))]:
             if not config_settings[operating_dir[0].strip()]:
                 config_settings[operating_dir[0]] = operating_dir[1]
 
@@ -963,6 +991,7 @@ def main():
         masterkey = ''
         proxy_host = config_settings['proxy_host']
         proxy_port = config_settings['proxy_port']
+        use_app_burp_file = str(config_settings['use_app_burp_file']).lower()
 
         if encrypt_all_creds == 'on':
             keys_key = cipher.keys_key(config_settings['keys_key'])
@@ -992,15 +1021,10 @@ def main():
                 gpgpassphrase = cipher.get_key(java_dir, secrets_dir, 'Secrets.jks', secrets_key, 'gpgpassphrase')
                 passphrase = cipher.decrypt_data(gpgpassphrase, masterkey)
 
-            subprocess.run('python file_encryptor.py -a encrypt', shell=True)
-        else:
-            subprocess.run('python file_encryptor.py -a decrypt', shell=True)
-
         while True:
             new_job = check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir,
                                     encrypt_all_creds, java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
-                                    proxy_host, proxy_port)
-
+                                    proxy_host, proxy_port, use_app_burp_file)
             if new_job:
                 job_name = os.path.split(new_job)[-1]
                 project_name = job_name.split('.')[0]
