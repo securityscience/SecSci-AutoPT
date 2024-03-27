@@ -221,7 +221,7 @@ def main():
         import_secrets(secrets_masterkey_encrypted, f'{encryption_type_text}_Secrets.jks', secrets_key, 'masterkey')
         import_secrets(secrets_gpgpassphrase_encrypted, f'{encryption_type_text}_Secrets.jks', secrets_key, 'gpgpassphrase')
 
-    secrets_details = (f'Instructions to setup Secrets for {encryption_type_text[int(encryption_type) - 1]} mode encryption:\n\n' +
+    secrets_details = (f'Instructions to setup Secrets for {encryption_type_text} mode encryption:\n\n' +
                        f'1) Rename {encryption_type_text}_Keys.jks to Keys.jks\n\n' +
                        f'2) Rename {encryption_type_text}_Secrets.jks to Secrets.jks\n\n' +
                        f'3) Use the following keys and put on Windows Credential Manager or KeyRing or ENV Variable Filesystem or Windows Registry\n\n' +
