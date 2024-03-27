@@ -224,7 +224,7 @@ def main():
     secrets_details = (f'Instructions to setup Secrets for {encryption_type_text} mode encryption:\n\n' +
                        f'1) Rename {encryption_type_text}_Keys.jks to Keys.jks\n\n' +
                        f'2) Rename {encryption_type_text}_Secrets.jks to Secrets.jks\n\n' +
-                       f'3) Use the following keys and put on Windows Credential Manager or KeyRing or ENV Variable Filesystem or Windows Registry\n\n' +
+                       f'3) Use the following keys and put on Windows Credential Manager or KeyRing or ENV Variable or Filesystem or Windows Registry\n\n' +
                        f'   {secrets_details_keys_key}\n\n' +
                        f'4) Use the following command to encrypt passwords and API keys:\n\n' +
                        f'   python password_encryptor.py -pk {secrets_details_masterkey} -s {secrets_details_masterkey_salt} -p <PASSWORD_TO_ENCRYPT>\n\n' +
