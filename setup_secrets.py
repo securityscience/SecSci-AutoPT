@@ -84,6 +84,7 @@ def password_match_check(password, input_text):
         if password != confirm_password:
             confirm_password = ''
             print(f'\n{input_text} mismatch!')
+    return password
 
 
 def main():
@@ -132,29 +133,29 @@ def main():
 
     if encryption_type == '3':
         if not validate_password(extreme_key_pass):
-            password_match_check(extreme_key_pass, 'Extreme key Password')
+            extreme_key_pass = password_match_check(extreme_key_pass, 'Extreme key Password')
         while not extreme_key_salt:
             extreme_key_salt = getpass.getpass(prompt='\nEnter Extreme key Salt: ')
 
     if encryption_type in ['1', '2', '3']:
         if not validate_password(keys_key):
-            password_match_check(keys_key, 'Keys keystore key')
+            keys_key = password_match_check(keys_key, 'Keys keystore key')
         if not validate_password(keys_masterkey_pass):
-            password_match_check(keys_masterkey_pass, 'Keys keystore Masterkey Password')
+            keys_masterkey_pass = password_match_check(keys_masterkey_pass, 'Keys keystore Masterkey Password')
         while not keys_masterkey_salt:
             keys_masterkey_salt = getpass.getpass(prompt='\nEnter Keys keystore Masterkey Salt: ')
         if not validate_password(secrets_key):
-            password_match_check(secrets_key, 'Secrets keystore key')
+            secrets_key = password_match_check(secrets_key, 'Secrets keystore key')
 
     if encryption_type in ['2', '3']:
         if not validate_password(secrets_masterkey_pass):
-            password_match_check(secrets_masterkey_pass, 'Secrets keystore Masterkey Password')
+            secrets_masterkey_pass = password_match_check(secrets_masterkey_pass, 'Secrets keystore Masterkey Password')
         while not secrets_masterkey_salt:
             secrets_masterkey_salt = getpass.getpass(prompt='\nEnter Secrets keystore Masterkey Salt: ')
 
     if encryption_type in ['1', '2', '3']:
         if not validate_password(gpg_passphrase):
-            password_match_check(gpg_passphrase, 'GNU Privacy Guard Passphrase')
+            gpg_passphrase = password_match_check(gpg_passphrase, 'GNU Privacy Guard Passphrase')
 
     encryption_type_text = ('Simple', 'Standard', 'Extreme')[int(encryption_type) - 1]
 
