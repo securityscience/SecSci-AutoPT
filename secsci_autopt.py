@@ -880,12 +880,6 @@ def cypress_job(new_job, config_settings, masterkey):
     burp_child_pid = get_child_process_ids(burp_pid)[0]
 
     # Add Environment Variables
-    '''if 'cypress_dir' in project_settings:
-        cypress_dir = project_settings['cypress_dir']
-    else:
-        cypress_dir = config_settings['cypress_dir']
-    print(cypress_dir)
-    exit()'''
     os.environ['CYPRESS_CACHE_FOLDER'] = project_settings['cypress_dir']
     os.environ['HTTP_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
     os.environ['HTTPS_PROXY'] = f'http://{config_settings["proxy_host"]}:{config_settings["proxy_port"]}'
@@ -948,7 +942,6 @@ def selenium_job():
 
 
 def process_encryption_mode(encrypt_all_creds):
-    print(encrypt_all_creds)
     if encrypt_all_creds == 'on':
         subprocess.run('python file_encryptor.py -a encrypt', shell=True)
     elif encrypt_all_creds == 'off':
