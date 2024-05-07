@@ -97,7 +97,7 @@
             $fn = explode("_", $f);
 
             echo "<tr>";
-            echo "<td><a href=\"" . $chkArchive . substr($f, 0, -5) . ".html\" target=\"reportView\">" . $fn[0] . "</a>
+            echo "<td><a href=\"" . $chkArchive . substr($f, 0, -5) . ".html\" target=\"reportView\">" . $fn[0] . "</a></td>");
             echo "<td><a href=\"" . $chkArchive . $f . "\" target=\"_blank\">Download</a></td>";
             echo "<td>" . date("Y-m-d H:i:s", filemtime($webRootPath . "/" . $chkArchive . "/" . $f)) . "</td>";
             echo "</tr>";
