@@ -1,7 +1,7 @@
 # ---------------------------------------
 # Sec-Sci AutoPT v4.2405 - January 2018
 # ---------------------------------------
-# Tool:      Setup Secrets v1.0
+# Tool:      Setup Secrets v1.01
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # Creator:   ARNEL C. REYES
@@ -88,7 +88,7 @@ def password_match_check(password, input_text):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Sec-Sci AutoPT Setup Secrets v1.0')
+    parser = argparse.ArgumentParser(description='Sec-Sci AutoPT Setup Secrets v1.01')
     parser.add_argument('-t', '--Type', type=str,
                         help='Encryption Type. [1] Simple; [2] Standard; [3] Extreme')
 
