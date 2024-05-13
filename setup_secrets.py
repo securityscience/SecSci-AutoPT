@@ -1,5 +1,5 @@
 # ---------------------------------------
-# Sec-Sci AutoPT v3.2311 - January 2018
+# Sec-Sci AutoPT v4.2405 - January 2018
 # ---------------------------------------
 # Tool:      Setup Secrets v1.0
 # Site:      www.security-science.com
