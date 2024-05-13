@@ -1,7 +1,7 @@
 # ---------------------------------------
-# Sec-Sci AutoPT v3.2311 - January 2018
+# Sec-Sci AutoPT v4.2405 - May 2024
 # ---------------------------------------
-# Tool:      Sec-Sci AutoPT v3.2311
+# Tool:      Sec-Sci AutoPT v4.2405
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # Creator:   ARNEL C. REYES
@@ -278,11 +278,11 @@ def gcr_account_activation(service_account, service_account_key):
     return True
 
 
-def jfr_account_activation(service_account, service_account_key):
+def jfr_account_activation(service_account, service_account_key, jfr_server):
     # JFrog Authentication to download images from the image repository
     print(f'\nActivating JFrog Service Account {service_account}')
-    account_activation = subprocess.run(f'jfrog auth activate-service-account {service_account} ' +
-                                        f'--key-file {service_account_key}', shell=True)
+    account_activation = subprocess.run(f'docker login -u {service_account} ' +
+                                        f'--password-stdin <  {service_account_key} {jfr_server}', shell=True)
 
     if account_activation.returncode != 0:
         return False
@@ -577,9 +577,25 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
 
     elif repository_type == 'jfr':
         jfr_service_account = project_settings["jfr_service_account"]
-        jfr_service_account_key = os.path.join(secrets_dir, f'{project_settings["jfr_service_account_key"]}')
+        if encrypt_all_creds == 'on':
+            # Decrypt GCR Service Account Key
+            cipher.decrypt_file(gpg_dir,
+                                f'{os.path.join(secrets_dir, project_settings["jfr_service_account_key"])}.gpg',
+                                f'{os.path.join(ws_dir, project_settings["jfr_service_account_key"])}',
+                                passphrase)
+        else:
+            try:
+                shutil.copy(f'{os.path.join(secrets_dir, project_settings["jfr_service_account_key"])}',
+                            f'{os.path.join(ws_dir, project_settings["jfr_service_account_key"])}')
+            except FileNotFoundError as e:
+                print(e)
+                cleanup_job(project_name, ws_dir)
+                return
+
+        jfr_service_account_key = os.path.join(ws_dir, f'{project_settings["jfr_service_account_key"]}')
+        jfr_server = project_settings["jfr_server"]
         pull_account = jfr_service_account
-        image_pull_account_activated = jfr_account_activation(jfr_service_account, jfr_service_account_key)
+        image_pull_account_activated = jfr_account_activation(jfr_service_account, jfr_service_account_key, jfr_server)
 
     elif repository_type == 'local':
         # Skip Pull Account Activation for imported image
