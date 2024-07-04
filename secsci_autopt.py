@@ -1,7 +1,7 @@
 # ---------------------------------------
-# Sec-Sci AutoPT v4.2405 - May 2024
+# Sec-Sci AutoPT v5.240704 - July 2024
 # ---------------------------------------
-# Tool:      Sec-Sci AutoPT v4.2405
+# Tool:      Sec-Sci AutoPT v5.240704
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # Creator:   ARNEL C. REYES
@@ -193,30 +193,48 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
 
     set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       os.path.join(ws_dir, f'{project_name}.burpoptions'),
-                      '{certificate}', certificate_file)
+                      '{certificate_file}', certificate_file)
 
     set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       '{certificate_password}', burp_certificate_password)
 
-    include_urls = str(project_settings['include_url']).split(',')
+    tls_pass_through = ''
 
-    include_objects = [f'{{"enabled":true,"prefix":"{include_url.strip()}"}}' for include_url in include_urls]
-    inc_urls = ','.join(include_objects)
+    if 'tls_pass_through_host' in project_settings:
+        tls_pass_through_hosts = str(project_settings['tls_pass_through_host']).replace('.','\\\\.').split(',')
 
-    if not include_urls[0]:
-        inc_urls = ''
+        if tls_pass_through_hosts[0]:
+            tls_pass_through_objects = [f'{{"enabled":true,"file":"^/.*","host":"^{tls_pass_through_host.strip()}$","protocol":"any"}}'
+                                        for tls_pass_through_host in tls_pass_through_hosts]
+            tls_pass_through = ','.join(tls_pass_through_objects)
+
+    set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
+                      os.path.join(ws_dir, f'{project_name}.burpoptions'),
+                      '{tls_pass_through_hosts}', tls_pass_through)
+
+    inc_urls = ''
+
+    if 'include_url' in project_settings:
+        include_urls = str(project_settings['include_url']).split(',')
+
+        if include_urls[0]:
+            include_objects = [f'{{"enabled":true,"include_subdomains":false,"prefix":"{include_url.strip()}"}}'
+                               for include_url in include_urls]
+            inc_urls = ','.join(include_objects)
 
     set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       '{include_urls}', inc_urls)
 
-    exclude_urls = str(project_settings['exclude_url']).split(',')
-    exclude_objects = [f'{{"enabled":true,"prefix":"{exclude_url}"}}' for exclude_url in exclude_urls]
-    exc_urls = ','.join(exclude_objects)
+    exc_urls = ''
 
-    if not exclude_urls[0]:
-        exc_urls = ''
+    if 'exclude_url' in project_settings:
+        exclude_urls = str(project_settings['exclude_url']).split(',')
+
+        if exclude_urls[0]:
+            exclude_objects = [f'{{"enabled":true,"include_subdomains":false,"prefix":"{exclude_url}"}}' for exclude_url in exclude_urls]
+            exc_urls = ','.join(exclude_objects)
 
     set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       os.path.join(ws_dir, f'{project_name}.burpoptions'),
@@ -225,6 +243,7 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
 
 
 def set_burp_settings(input_file, outputfile, current_string, new_string):
+
     try:
         with open(input_file, 'r') as file:
             file_content = file.read()
