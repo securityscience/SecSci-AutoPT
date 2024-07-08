@@ -582,7 +582,7 @@
         },
         "request_listeners":[
             {
-                "certificate_file":"{certificate}",
+                "certificate_file":"{certificate_file}",
                 "certificate_mode":"custom",
                 "certificate_password":"{certificate_password}",
                 "custom_tls_protocols":[
@@ -613,25 +613,7 @@
         "ssl_pass_through":{
             "apply_to_out_of_scope_items":true,
             "automatically_add_entries_on_client_ssl_negotiation_failure":false,
-            "rules":[
-                {
-                    "enabled":true,
-                    "host":"https://tsl_pass_through_url1",
-                    "port":"443",
-                    "protocol":"any"
-                },
-                {
-                    "enabled":true,
-                    "host":"https://tsl_pass_through_url2",
-                    "port":"443",
-                    "protocol":"any"
-                },
-                {
-                    "enabled":true,
-                    "host":"https://commerce-stage.oktapreview.com",
-                    "protocol":"any"
-                }
-            ]
+            "rules":[{tls_pass_through_hosts}]
         },
         "web_sockets_history_display_filter":{
             "by_annotation":{
