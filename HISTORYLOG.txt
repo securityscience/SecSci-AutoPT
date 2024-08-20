@@ -1,4 +1,28 @@
-version 3.2311 (Nov 07, 2023)
+version 5.240704 (JULY 4, 2024)
+  * Functionality Enhancements & New Features Added
+  * Added SSL or TLS Pass Through
+  * Enhanced Target Scope Inclusion and Exclusion
+  * Updated Project Settings (to align with the latest version of Burp and all its features)
+
+
+version 4.2405 (MAY 13, 2024)
+  * Fixed JFrog Authentication and Service Account Key Encryption
+  * Execute encryption mode before running a job
+  * Fixed Cypress job
+  * Fixed Cypress override
+  * Added Docker job to run container from imported images or local copies
+
+
+version 4.2403 (MAR 26, 2024)
+  * Setup Secrets v1.01 (A tool to setup Keys and Secrets keystores)
+
+
+version 3.2311 (NOV 26, 2023)
+  * Added Encryption Modes
+    + Simple, Standard, and Extreme Encryption Options
+
+
+version 3.2311 (NOV 07, 2023)
   * Python version of Sec-Sci AutoPT
   * Suports Windows and Linux-Based Machines
   * Much faster and easy to manage
@@ -8,6 +32,8 @@ version 3.2311 (Nov 07, 2023)
     - Environment Variables is handled by the Framework
     - More flexibility and customization in scanning farm deployment
     - Provides encryption for certificates and credentials
+      + Password Encryption (password_encryptor.py)
+      + Certificate and Private Keys Encryption (file_encryptor.py)
     - Report dashboard is coverted from ASP.Net to PHP
     - Cypress: Supports multiple version of Cypress depends on project requirement
       + Brower options are Firefox, Chrome and Electron
@@ -38,7 +64,7 @@ version 2.2305 (MAY 22, 2023)
   - Updated PenTest Automation core script to incorporate the customized "File Upload" feature.
 
 
-version 2.2205 (MAY 05, 2022)
+version 2.2205 (MAY 05, 2022) - Implemented at NCR Corporation Headquarter
   - Integration of QA Acceptance Testing Docker Container.
 
 
@@ -58,7 +84,7 @@ version 2.2102 (FEB 14, 2021)
     - Close Burp After Scan is Completed: It Automatically closes Burp after the vulnerability scan has finished.
 
 
-version 2.2011 (OCT 11, 2020) - NCR Corporation Headquarter
+version 2.2011 (OCT 11, 2020)
   - Integration of Cucumber, Cypress, Selenium, and Robot Framework that provides a customizable and extendable automation capability.
   - It supports both API service calls functionality testing and UI functionality testing.
 
@@ -75,7 +101,7 @@ version 2.1907 (JUL 08, 2019)
     - The email notification may include pertinent details about the assessment results and any critical findings.
 
 
-version 1.1901 (JAN 18, 2019) - Carnival Corporation Headquarter
+version 1.1901 (JAN 18, 2019) - Implemented at Carnival Corporation Headquarter
   * Sec-Sci AutoPT RegEx Helper for WebInspect
     - Creates regular expressions for target URLs.
 
@@ -122,7 +148,7 @@ version 1.1710 (OCT 26, 2017)
     - RegEx Completion auto-email notification.
 
 
-version 1.1708 (AUG 31, 2017) - FedEx Headquarter
+version 1.1708 (AUG 31, 2017) - Implemented at FedEx Headquarter
   * Sec-Sci AutoPT WISmartScan
     - Faster scan time
     - Less database scan file size
