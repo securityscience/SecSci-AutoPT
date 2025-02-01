@@ -9,7 +9,7 @@ This open-source framework is a meticulously crafted proof of concept (POC), des
 
 ## Key Features and Functionality:
 - **Automated Scanning**: The framework automatically sets the project to scan, initiating the automated scanning process using BurpSuite Pro. It allows for quick and accurate vulnerability assessments of web applications.
-- **Continuous Integration**: Sec-Sci AutoPT is integrated into the build pipeline through a Continuous Integration (CI) server. It efficiently fetches code from the repository and triggers the pen testing process as needed.
+- **Continuous Integration**: Sec-Sci AutoPT is integrated into the build pipeline through a Continuous Integration and Continuous Delivery (CI-CD) pipeline. It efficiently fetches QA testing or Functionality testing automation packages from the repository and triggers the pen testing process as needed.
 - **Versatile Testing Environment**: The framework ensures consistent and isolated testing environments by utilizing Docker containerization. This enables efficient deployment and management of different testing setups.
 - **Customizable Automation**: The integration of Cucumber, Cypress, Selenium, and Robot Framework provides a customizable and extendable automation capability. It supports both API service calls functionality testing and UI functionality testing.
 - **Security Assessment and Reporting**: The automated pen testing platform executes the QA acceptance testing, running the appropriate testing tools (e.g., Docker, Cucumber, Cypress, Selenium, Robot Framework, and/or Python) based on the project type. It allows for a thorough vulnerability scan process.
