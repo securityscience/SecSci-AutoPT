@@ -375,7 +375,7 @@ def smtp_mail(smtp_server, smtp_port, smtp_username, smtp_password, email_from, 
 
         # Compose the email
         the_message["From"] = email_from
-        the_message["To"] = email_to
+        the_message["To"] = ", ".join(email_to)
         the_message["Subject"] = subject
 
         mail_server.sendmail(email_from, email_to, the_message.as_string())
@@ -388,6 +388,7 @@ def smtp_mail(smtp_server, smtp_port, smtp_username, smtp_password, email_from, 
 
 
 def send_email(config_settings, email_to, subject, message, masterkey):
+    print(email_to)
     mailer = str(config_settings['mailer']).lower()
     encrypt_all_creds = str(config_settings['encrypt_all_creds']).lower()
     sendgrid_api_key = config_settings['sendgrid_api_key']
@@ -542,6 +543,8 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
                        docker_service_error_subject,
                        docker_service_error_message,
                        masterkey)
+            print("email")
+            exit()
 
             first_email_notice = True
 
