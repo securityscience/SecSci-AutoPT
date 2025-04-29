@@ -592,7 +592,7 @@
                     "TLSv1.3"
                 ],
                 "enable_http2":true,
-                "listen_mode":"specific_address",
+                "listen_mode":"{proxy_listen_mode}",
                 "listen_specific_address":"{proxy_host}",
                 "listener_port":{proxy_port},
                 "running":true,
