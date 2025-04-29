@@ -16,9 +16,12 @@ This open-source framework is a meticulously crafted proof of concept (POC), des
 - **Efficient Vulnerability Management**: The framework allocates sufficient time for the vulnerability scan process to complete, ensuring comprehensive coverage of the target. Upon completion, it automatically closes Burp and archives old vulnerability reports for historical reference.
 - **Clear and Informative Reporting**: Sec-Sci AutoPT generates comprehensive vulnerability reports. It also sends email notifications to relevant stakeholders, providing concise summaries of the security assessment results.
 
+---
 
 ## Full Documentation
 Visit: https://www.security-science.com/sec-sci-autopt
+
+---
 
 ## License
 This project is licensed under the [GPL-3.0 license] - see the [LICENSE.txt](LICENSE.txt) file for details.
