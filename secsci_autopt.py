@@ -1,7 +1,7 @@
 # ---------------------------------------
-# Sec-Sci AutoPT v5.240704 - July 2024
+# Sec-Sci AutoPT v6.250429 - April 2025
 # ---------------------------------------
-# Tool:      Sec-Sci AutoPT v5.240704
+# Tool:      Sec-Sci AutoPT v6.250429
 # Site:      www.security-science.com
 # Email:     RnD@security-science.com
 # Creator:   ARNEL C. REYES
@@ -13,6 +13,8 @@
 # pip install psutil
 
 from email.mime.multipart import MIMEMultipart
+
+from ellipticcurve import toString
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from email.mime.text import MIMEText
@@ -64,7 +66,7 @@ def docker_status():
 
 
 def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                  java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
+                  java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase, proxy_listen_mode,
                   proxy_host, proxy_port, use_app_burp_file):
     job_file = os.path.join(job_dir, '*.job')
 
@@ -75,7 +77,8 @@ def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, en
 
         # Get the oldest job
         if not prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                           secrets_dir, gpg_dir, masterkey, passphrase, proxy_host, proxy_port, use_app_burp_file):
+                           secrets_dir, gpg_dir, masterkey, passphrase, proxy_listen_mode, proxy_host,
+                           proxy_port, use_app_burp_file):
 
             return
         return new_job
@@ -84,7 +87,7 @@ def check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir, en
 
 
 def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encrypt_all_creds,
-                secrets_dir, gpg_dir, masterkey, passphrase, proxy_host, proxy_port, use_app_burp_file):
+                secrets_dir, gpg_dir, masterkey, passphrase, proxy_listen_mode, proxy_host, proxy_port, use_app_burp_file):
     encrypt_all_creds = str(encrypt_all_creds).lower()
     # Encrypt or Decrypt Files or Do Nothing
     process_encryption_mode(encrypt_all_creds)
@@ -162,13 +165,14 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
                 cleanup_job(project_name, ws_dir)
                 return False
 
-        if encrypt_all_creds == 'on':
+    if encrypt_all_creds == 'on':
+        if burp_certificate:
             burp_certificate_password = cipher.decrypt_data(burp_certificate_password, masterkey)
-            encrypted_files = glob.glob(os.path.join(ws_dir, '*.gpg'))
+        encrypted_files = glob.glob(os.path.join(ws_dir, '*.gpg'))
 
-            for encrypted_file in encrypted_files:
-                decrypted_file = os.path.basename(encrypted_file)
-                cipher.decrypt_file(gpg_dir, encrypted_file, os.path.join(ws_dir, decrypted_file[:-4]), passphrase)
+        for encrypted_file in encrypted_files:
+            decrypted_file = os.path.basename(encrypted_file)
+            cipher.decrypt_file(gpg_dir, encrypted_file, os.path.join(ws_dir, decrypted_file[:-4]), passphrase)
 
     try:
         shutil.copy(os.path.join(burp_templates_dir, project_settings['burp_template']),
@@ -178,6 +182,10 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
         exit()
 
     # Set BurpOptions Variables
+    set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
+                      os.path.join(ws_dir, f'{project_name}.burpoptions'),
+                      '{proxy_listen_mode}', proxy_listen_mode)
+
     set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       os.path.join(ws_dir, f'{project_name}.burpoptions'),
                       '{proxy_host}', proxy_host)
@@ -308,6 +316,17 @@ def jfr_account_activation(service_account, service_account_key, jfr_server):
     return True
 
 
+def dkr_account_activation(service_account, service_account_key):
+    # JFrog Authentication to download images from the image repository
+    print(f'\nActivating Docker Hub Service Account {service_account}')
+    account_activation = subprocess.run(f'docker login -u {service_account} ' +
+                                        f'--password-stdin <  {service_account_key}', shell=True)
+
+    if account_activation.returncode != 0:
+        return False
+    return True
+
+
 def prepare_docker(project_name, image_url):
     print('\nPreparing Docker Image...')
     print(f'\nCleaning Up {project_name} Docker Container.')
@@ -343,8 +362,11 @@ def run_container(project_name, ws_dir, docker_volume, docker_entrypoint, image_
 
 def sendgrid_mail(api_key, email_from, email_to, subject, message):
     to_emails = []
-    for email in email_to:
-        to_emails.append(email)
+    if isinstance(email_to, tuple):
+        for email in email_to:
+            to_emails.append(email)
+    else:
+        to_emails.append(email_to)
 
     sg = SendGridAPIClient(api_key)
     mail_message = Mail(
@@ -375,7 +397,10 @@ def smtp_mail(smtp_server, smtp_port, smtp_username, smtp_password, email_from, 
 
         # Compose the email
         the_message["From"] = email_from
-        the_message["To"] = ", ".join(email_to)
+        if isinstance(email_to, tuple):
+            the_message["To"] = ", ".join(email_to)
+        else:
+            the_message["To"] = email_to
         the_message["Subject"] = subject
 
         mail_server.sendmail(email_from, email_to, the_message.as_string())
@@ -388,7 +413,6 @@ def smtp_mail(smtp_server, smtp_port, smtp_username, smtp_password, email_from, 
 
 
 def send_email(config_settings, email_to, subject, message, masterkey):
-    print(email_to)
     mailer = str(config_settings['mailer']).lower()
     encrypt_all_creds = str(config_settings['encrypt_all_creds']).lower()
     sendgrid_api_key = config_settings['sendgrid_api_key']
@@ -427,38 +451,38 @@ def send_email(config_settings, email_to, subject, message, masterkey):
                   message)
 
 
-def run_burpsuite(java_dir, burp_dir, burp_temp_dir, ws_dir, project_name):
+def run_burpsuite(java_dir, burp_run_cmd, burp_temp_dir, ws_dir, project_name):
     # Delete Burp Temp Files
     if os.path.exists(burp_temp_dir) and os.path.isdir(burp_temp_dir):
         shutil.rmtree(burp_temp_dir, ignore_errors=True)
         os.makedirs(burp_temp_dir, exist_ok=True)
 
     java = os.path.join(java_dir, 'java')
-    burp_jar = os.path.join(burp_dir, 'burpsuite_pro.jar')
+    # burp_jar = os.path.join(burp_run_cmd, 'burpsuite_pro.jar')
     burp_project = os.path.join(ws_dir, f'{project_name}.burp')
     burp_config = os.path.join(ws_dir, f'{project_name}.burpoptions')
 
     print('\nRunning Burpsuite Pro...')
-    burp = subprocess.Popen(f'{java} --illegal-access=permit -jar {burp_jar} ' +
+    burp = subprocess.Popen(f'{java} --illegal-access=permit {burp_run_cmd} ' +
                             f'--xBurp --project-file={burp_project} ' +
                             f'--config-file={burp_config} --auto-repair ' +
                             '--unpause-spider-and-scanner --disable-auto-update', shell=True)
 
-    time.sleep(11)
     return burp.pid
 
 
-def export_report(java_dir, burp_dir, ws_dir, project_name, burp_report_format):
+def export_report(java_dir, burp_run_cmd, ws_dir, project_name, burp_report_format):
     java = os.path.join(java_dir, 'java')
-    burp_jar = os.path.join(burp_dir, 'burpsuite_pro.jar')
+    # burp_jar = os.path.join(burp_run_cmd, 'burpsuite_pro.jar')
     burp_report_filename = os.path.join(ws_dir, project_name)
     burp_project = os.path.join(ws_dir, f'{project_name}.burp')
 
     print('\nExporting PenTest Report...')
-    burp = subprocess.run(f'{java} --illegal-access=permit -Djava.awt.headless=true ' +
-                          f'-jar {burp_jar} --xReport {burp_report_format} ' +
+    burp = subprocess.run(f'{java} --illegal-access=permit -Djava.awt.headless=true {burp_run_cmd} ' +
+                          f'--xReport {burp_report_format} ' +
                           f'{burp_report_filename} --project-file={burp_project} ' +
                           '--auto-repair --disable-auto-update', shell=True)
+
     return burp.returncode
 
 
@@ -543,8 +567,6 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
                        docker_service_error_subject,
                        docker_service_error_message,
                        masterkey)
-            print("email")
-            exit()
 
             first_email_notice = True
 
@@ -600,7 +622,7 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
     elif repository_type == 'jfr':
         jfr_service_account = project_settings["jfr_service_account"]
         if encrypt_all_creds == 'on':
-            # Decrypt GCR Service Account Key
+            # Decrypt JFrog Service Account Key
             cipher.decrypt_file(gpg_dir,
                                 f'{os.path.join(secrets_dir, project_settings["jfr_service_account_key"])}.gpg',
                                 f'{os.path.join(ws_dir, project_settings["jfr_service_account_key"])}',
@@ -618,6 +640,27 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
         jfr_server = project_settings["jfr_server"]
         pull_account = jfr_service_account
         image_pull_account_activated = jfr_account_activation(jfr_service_account, jfr_service_account_key, jfr_server)
+
+    elif repository_type == 'dkr':
+        dkr_service_account = project_settings["dkr_service_account"]
+        if encrypt_all_creds == 'on':
+            # Decrypt Docker Service Account Key
+            cipher.decrypt_file(gpg_dir,
+                                f'{os.path.join(secrets_dir, project_settings["dkr_service_account_key"])}.gpg',
+                                f'{os.path.join(ws_dir, project_settings["dkr_service_account_key"])}',
+                                passphrase)
+        else:
+            try:
+                shutil.copy(f'{os.path.join(secrets_dir, project_settings["dkr_service_account_key"])}',
+                            f'{os.path.join(ws_dir, project_settings["dkr_service_account_key"])}')
+            except FileNotFoundError as e:
+                print(e)
+                cleanup_job(project_name, ws_dir)
+                return
+
+        dkr_service_account_key = os.path.join(ws_dir, f'{project_settings["dkr_service_account_key"]}')
+        pull_account = dkr_service_account
+        image_pull_account_activated = dkr_account_activation(dkr_service_account, dkr_service_account_key)
 
     elif repository_type == 'local':
         # Skip Pull Account Activation for imported image
@@ -661,14 +704,15 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
         cleanup_job(project_name, ws_dir)
         return
 
-    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
+    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_run_cmd'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
-    burp_child_pid = get_child_process_ids(burp_pid)[0]
+    # burp_child_pid = get_child_process_ids(burp_pid)[0]
 
     is_container_running = False
-    while is_process_id_running(burp_child_pid):
+    while is_process_id_running(burp_pid):
         if not is_container_running:
+            time.sleep(25)
             container_status = run_container(project_name, ws_dir, project_settings['docker_volume'],
                                              project_settings['docker_entrypoint'],
                                              image_url, project_settings['docker_entrypoint_script'])
@@ -688,7 +732,7 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
 
     print('\nBurp scan completed...')
 
-    xreport = export_report(config_settings['java_dir'], config_settings['burp_dir'], ws_dir,
+    xreport = export_report(config_settings['java_dir'], config_settings['burp_run_cmd'], ws_dir,
                             project_name, config_settings['burp_report_format'])
 
     if xreport != 0:
@@ -721,7 +765,7 @@ def cucumber_job(new_job, config_settings, masterkey):
 
     email_to = project_settings['email_to']
 
-    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
+    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_run_cmd'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
     burp_child_pid = get_child_process_ids(burp_pid)[0]
@@ -755,7 +799,7 @@ def cucumber_job(new_job, config_settings, masterkey):
 
     print('\nBurp scan completed...')
 
-    xreport = export_report(config_settings['java_dir'], config_settings['burp_dir'], ws_dir,
+    xreport = export_report(config_settings['java_dir'], config_settings['burp_run_cmd'], ws_dir,
                             project_name, config_settings['burp_report_format'])
 
     if xreport != 0:
@@ -811,7 +855,7 @@ def robot_framework_job(new_job, config_settings, masterkey):
         cleanup_job(project_name, ws_dir)
         return
 
-    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
+    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_run_cmd'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
     burp_child_pid = get_child_process_ids(burp_pid)[0]
@@ -855,7 +899,7 @@ def robot_framework_job(new_job, config_settings, masterkey):
     del os.environ['HTTP_PROXY']
     del os.environ['HTTPS_PROXY']
 
-    xreport = export_report(config_settings['java_dir'], config_settings['burp_dir'], ws_dir,
+    xreport = export_report(config_settings['java_dir'], config_settings['burp_run_cmd'], ws_dir,
                             project_name, config_settings['burp_report_format'])
 
     if xreport != 0:
@@ -912,7 +956,7 @@ def cypress_job(new_job, config_settings, masterkey):
         cleanup_job(project_name, ws_dir)
         return
 
-    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_dir'],
+    burp_pid = run_burpsuite(config_settings['java_dir'], config_settings['burp_run_cmd'],
                              config_settings['burp_temp_dir'], config_settings['ws_dir'], project_name)
 
     burp_child_pid = get_child_process_ids(burp_pid)[0]
@@ -951,7 +995,7 @@ def cypress_job(new_job, config_settings, masterkey):
     del os.environ['HTTP_PROXY']
     del os.environ['HTTPS_PROXY']
 
-    xreport = export_report(config_settings['java_dir'], config_settings['burp_dir'], ws_dir,
+    xreport = export_report(config_settings['java_dir'], config_settings['burp_run_cmd'], ws_dir,
                             project_name, config_settings['burp_report_format'])
 
     if xreport != 0:
@@ -1020,6 +1064,7 @@ def main():
         gpg_dir = config_settings['gpg_dir']
         passphrase = ''
         masterkey = ''
+        proxy_listen_mode = config_settings['proxy_listen_mode']
         proxy_host = config_settings['proxy_host']
         proxy_port = config_settings['proxy_port']
         use_app_burp_file = str(config_settings['use_app_burp_file']).lower()
@@ -1055,7 +1100,7 @@ def main():
         while True:
             new_job = check_new_job(job_dir, repo_dir, burp_templates_dir, ws_dir, reports_dir,
                                     encrypt_all_creds, java_dir, secrets_dir, keys_key, gpg_dir, masterkey, passphrase,
-                                    proxy_host, proxy_port, use_app_burp_file)
+                                    proxy_listen_mode, proxy_host, proxy_port, use_app_burp_file)
             if new_job:
                 job_name = os.path.split(new_job)[-1]
                 project_name = job_name.split('.')[0]
