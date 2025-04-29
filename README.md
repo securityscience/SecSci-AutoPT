@@ -7,6 +7,8 @@ The version 5 was released in July 2024. Sec-Sci AutoPT stands as a testament to
 
 This open-source framework is a meticulously crafted proof of concept (POC), designed to simplify the intricate task of identifying and mitigating security vulnerabilities in applications and systems. Its strength lies in the seamless integration of potent tools such as BurpSuite Pro, Docker, Cucumber, Cypress, Selenium, Robot Framework, and Python. Together, they orchestrate a comprehensive and automated penetration testing workflow, ensuring a thorough assessment and discovery of potential weaknesses.
 
+---
+
 ## Key Features and Functionality:
 - **Automated Scanning**: The framework automatically sets the project to scan, initiating the automated scanning process using BurpSuite Pro. It allows for quick and accurate vulnerability assessments of web applications.
 - **Continuous Integration**: Sec-Sci AutoPT is integrated into the build pipeline through a Continuous Integration and Continuous Delivery (CI-CD) pipeline. It efficiently fetches QA testing or Functionality testing automation packages from the repository and triggers the pen testing process as needed.
