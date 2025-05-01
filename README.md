@@ -1,4 +1,4 @@
-# Sec-Sci AutoPT
+## Sec-Sci AutoPT
 
 ## 📋 Introduction
 Sec-Sci AutoPT, an Automated Penetration Testing (AutoPT) framework, has undergone a remarkable evolution since its inception in 2017 as version 1 tailored for HP WebInspect. Transitioning to BurpSuite Pro in 2019 marked a strategic move, driven by considerations of cost-effectiveness and a desire for a more streamlined implementation.
@@ -23,4 +23,4 @@ Visit: https://www.security-science.com/sec-sci-autopt
 
 
 ## License
-This project is licensed under the [GPL-3.0 license] - see the [LICENSE.txt](LICENSE.txt) file for details.
+This project is licensed under the [GPL-3.0 license] - see the [LICENSE](LICENSE) file for details.
