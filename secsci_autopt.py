@@ -241,7 +241,8 @@ def prepare_job(new_job, repo_dir, burp_templates_dir, ws_dir, reports_dir, encr
         exclude_urls = str(project_settings['exclude_url']).split(',')
 
         if exclude_urls[0]:
-            exclude_objects = [f'{{"enabled":true,"include_subdomains":false,"prefix":"{exclude_url}"}}' for exclude_url in exclude_urls]
+            exclude_objects = [f'{{"enabled":true,"include_subdomains":false,"prefix":"{exclude_url.strip()}"}}'
+                               for exclude_url in exclude_urls]
             exc_urls = ','.join(exclude_objects)
 
     set_burp_settings(os.path.join(ws_dir, f'{project_name}.burpoptions'),
@@ -712,7 +713,7 @@ def docker_job(new_job, config_settings, masterkey, passphrase):
     is_container_running = False
     while is_process_id_running(burp_pid):
         if not is_container_running:
-            time.sleep(25)
+            time.sleep(38)
             container_status = run_container(project_name, ws_dir, project_settings['docker_volume'],
                                              project_settings['docker_entrypoint'],
                                              image_url, project_settings['docker_entrypoint_script'])
